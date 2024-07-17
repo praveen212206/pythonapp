@@ -13,7 +13,7 @@ node {
     }
 
     stage('Push image to ECR') {
-        withDockerRegistry([credentialsId: "aws-ecr-credentials", url: ecrRegistryUrl]) {
+        withDockerRegistry([credentialsId: "aws-ecr-credentials", url:891377182218.dkr.ecr.ap-southeast-1.amazonaws.com/pythonapplicationdocker]) {
             app.push()
             docker.image(imageName).push('latest')
         }
