@@ -9,22 +9,21 @@ node {
     }
 
     stage('Build image') {
-        app = docker.build(imageName)
+        sh  docker build -t (imageName) .
     }
 
-    stage('Push image to ECR') {
-        withDockerRegistry([credentialsId: "891377182218", url:891377182218.dkr.ecr.ap-southeast-1.amazonaws.com/pythonapplicationdocker]) {
-            app.push()
-            docker.image(imageName).push('latest')
-        }
-    }
+//     stage('Push image to ECR') {
+//         withDockerRegistry([credentialsId: "891377182218", url:891377182218.dkr.ecr.ap-southeast-1.amazonaws.com/pythonapplicationdocker]) {
+//             app.push()
+//             docker.image(imageName).push('latest')
+//         }
+//     }
 
-    stage('Deploy') {
-        sh("docker run -d -p 3333:3333 ${imageName}")
-    }
+//     stage('Deploy') {
+//         sh("docker run -d -p 3333:3333 ${imageName}")
+//     }
 
-    stage('Remove old images') {
-        sh("docker rmi ${imageName} -f")
-    }
-}
-
+//     stage('Remove old images') {
+//         sh("docker rmi ${imageName} -f")
+//     }
+// }
