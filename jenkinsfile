@@ -6,7 +6,7 @@
         ECR_REPO = 'pythonapplicationdocker'
         AWS_ACCOUNT_ID = '891377182218'
         URL_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-        NAME= "Testpython"
+        NAME= "testpython"
     }
         stages {
 
