@@ -1,7 +1,7 @@
 node {
-    def application = "pythonapp"
+    def application = "pythonapplicationdocker"
     def awsRegion = "ap-southeast-1" // Replace with your AWS region
-    def ecrRegistryUrl = "public.ecr.aws/i1t4g6o8/pythonapplicationdocker" // Replace with your ECR registry URL
+    def ecrRegistryUrl = "891377182218.dkr.ecr.ap-southeast-1.amazonaws.com/pythonapplicationdocker" // Replace with your ECR registry URL
     def imageName = "${ecrRegistryUrl}/${application}:${BUILD_NUMBER}"
 
     stage('Clone repository') {
@@ -27,3 +27,4 @@ node {
         sh("docker rmi ${imageName} -f")
     }
 }
+
