@@ -26,4 +26,4 @@ node {
 //     stage('Remove old images') {
 //         sh("docker rmi ${imageName} -f")
 //     }
-// }
+}
