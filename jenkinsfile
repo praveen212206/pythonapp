@@ -1,10 +1,10 @@
 pipeline {
     agent any
     environment {
-        AWS_REGION = 'ap-southeast-1'
+        AWS_DEFAULT_REGION = 'ap-southeast-1'
         ECR_REPO = 'pythonapplicationdocker'
         AWS_ACCOUNT_ID = '891377182218'
-        URL_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+        URL_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
         NAME = "testpython"
     }
     stages {
@@ -17,7 +17,14 @@ pipeline {
         stage ('Docker Login') {
             steps {
                 script {
-                sh """aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"""
+                    withCredentials([usernamePassword(credentialsId: 'ECR_CREDS', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        def ecrLoginCmd = "aws ecr get-login-password --region ${AWS_DEFAULT_REGION}"
+                        def ecrPassword = sh(script: ecrLoginCmd, returnStdout: true).trim()
+                        
+                        // Docker login to ECR
+                        def dockerLoginCmd = "docker login --username AWS --password ${ecrPassword} ${URL_REGISTRY}"
+                        sh dockerLoginCmd
+                    }
                 }
             }
         }
@@ -37,7 +44,7 @@ pipeline {
         stage ('Push to ECR') {
             steps {
                 script {
-                    sh "aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/i1t4g6o8"
+                    // Tag and push Docker image to ECR
                     sh "docker tag $NAME ${URL_REGISTRY}/${ECR_REPO}:latest"
                     sh "docker push ${URL_REGISTRY}/${ECR_REPO}:latest"
                 }
