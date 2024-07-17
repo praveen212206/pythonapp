@@ -16,12 +16,11 @@
                 }
             }
 
-            stage ('Removing Exisitng container and imges')
-
+            stage ('Removing Exisitng container and imges') {
                 steps {
                     sh "docker rmi $NAME"
                 }
-
+            }
             stage ('Build Docker Image') {
                 steps {
                     sh "docker build -t $NAME ."
