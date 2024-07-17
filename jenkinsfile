@@ -1,6 +1,13 @@
     pipeline {
         // tool { 'nodejs' }
         agent {any 'any'}
+        environment {
+        AWS_REGION = 'ap-southeast-1'
+        ECR_REPO = 'pythonapplicationdocker'
+        AWS_ACCOUNT_ID = '891377182218'
+        URL_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+        NAME= "Testpython"
+    }
         stages {
 
             stage ('SCM') { 
@@ -11,9 +18,11 @@
 
             stage ('Build Docker Image') {
                 steps {
-                    sh "docker build -t test ."
+                    sh "docker build -t $(NAME) ."
                 }
 
             }
+
+ 
         }
     }
