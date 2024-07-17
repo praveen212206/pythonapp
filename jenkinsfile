@@ -9,7 +9,7 @@ node {
     }
 
     stage('Build image') {
-        sh  docker build -t (imageName) .
+        sh  "docker build -t(imageName) ."
     }
 //     stage('Push image to ECR') {
 //         withDockerRegistry([credentialsId: "891377182218", url:891377182218.dkr.ecr.ap-southeast-1.amazonaws.com/pythonapplicationdocker]) {
