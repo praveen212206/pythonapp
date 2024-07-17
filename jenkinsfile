@@ -10,7 +10,7 @@
     }
         stages {
 
-            stage ('Docker Push Image') {
+            stage ('Docker Login') {
                 steps {
                 // script {
                     withCredentials([usernamePassword(credentialsId: 'AWS_SECRET_KEYS', usernameVariable: 'AWS_SECRET_KEYS', passwordVariable: 'AWS_SECRET_KEYS')]) {
