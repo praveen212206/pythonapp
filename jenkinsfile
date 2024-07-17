@@ -10,14 +10,14 @@
     }
         stages {
 
-            stage (Docker Push Image) {
+            stage ('Docker Push Image') {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'AWS_SECRET_KEYS', usernameVariable: 'AWS_SECRET_KEYS', passwordVariable: 'AWS_SECRET_KEYS')]) {
                     // Login to ECR
                         sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${URL_REGISTRY}"
                     }
             }
-            
+
             stage ('SCM') { 
                 steps {
                     checkout scm
