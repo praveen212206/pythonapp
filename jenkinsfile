@@ -1,31 +1,13 @@
-node {
-    def application = "pythonapplicationdocker"
-    def awsRegion = "ap-southeast-1" // Replace with your AWS region
-    def ecrRegistryUrl = "891377182218.dkr.ecr.ap-southeast-1.amazonaws.com/pythonapplicationdocker" // Replace with your ECR registry URL
-    def imageName = "${ecrRegistryUrl}/${application}:${BUILD_NUMBER}"
+pipeline {
+    tool {'nodejs'}
+    agent {'any'}
 
-    stage('Clone repository') {
-        checkout scm
-    }
+    stages {
 
-    stage('Build image') {
-        step {
-           sh  "docker build -t test ."     
+        stage ('SCM') { 
+            steps {
+                checkout scm
+            }
         }
-        
     }
-//     stage('Push image to ECR') {
-//         withDockerRegistry([credentialsId: "891377182218", url:891377182218.dkr.ecr.ap-southeast-1.amazonaws.com/pythonapplicationdocker]) {
-//             app.push()
-//             docker.image(imageName).push('latest')
-//         }
-//     }
-
-//     stage('Deploy') {
-//         sh("docker run -d -p 3333:3333 ${imageName}")
-//     }
-
-//     stage('Remove old images') {
-//         sh("docker rmi ${imageName} -f")
-//     }
- }
+}
