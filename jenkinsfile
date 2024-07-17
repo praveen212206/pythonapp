@@ -14,16 +14,16 @@ pipeline {
             }
         }
 
-        stage ('Docker Login') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'ECR-DEMO-CREDS', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                    script {
-                        // Login to ECR
-                        sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${URL_REGISTRY}"
-                    }
-                }
-            }
-        }
+        // stage ('Docker Login') {
+        //     steps {
+        //         withCredentials([usernamePassword(credentialsId: 'ECR-DEMO-CREDS', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+        //             script {
+        //                 // Login to ECR
+        //                 sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${URL_REGISTRY}"
+        //             }
+        //         }
+        //     }
+        // }
 
         stage ('Removing Existing Container and Images') {
             steps {
@@ -40,6 +40,7 @@ pipeline {
         stage ('Push to ECR') {
             steps {
                 script {
+                    sh "aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/i1t4g6o8"
                     sh "docker tag $NAME ${URL_REGISTRY}/${ECR_REPO}:latest"
                     sh "docker push ${URL_REGISTRY}/${ECR_REPO}:latest"
                 }
