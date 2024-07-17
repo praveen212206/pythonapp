@@ -1,42 +1,49 @@
-    pipeline {
-        // tool { 'nodejs' }
-        agent {any 'any'}
-        environment {
+pipeline {
+    agent any
+    environment {
         AWS_REGION = 'ap-southeast-1'
         ECR_REPO = 'pythonapplicationdocker'
         AWS_ACCOUNT_ID = '891377182218'
         URL_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-        NAME= "testpython"
+        NAME = "testpython"
     }
-        stages {
-
-            stage ('SCM') { 
-                steps {
-                    checkout scm
-                }
+    stages {
+        stage ('SCM') {
+            steps {
+                checkout scm
             }
+        }
 
-            stage ('Docker Login') {
-                steps {
+        stage ('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'ECR-DEMO-CREDS', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     script {
-                    withCredentials([usernamePassword(credentialsId: 'ECR-DEMO-CREDS', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                         // Login to ECR
-                        sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username CICD-ECR-ALL --password-stdin ${URL_REGISTRY}"
+                        sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${URL_REGISTRY}"
                     }
                 }
-             }
             }
+        }
 
-            stage ('Removing Exisitng container and imges') {
-                steps {
-                    sh "docker rmi $NAME"
+        stage ('Removing Existing Container and Images') {
+            steps {
+                sh "docker rmi $NAME || true"  // Use || true to ignore errors if image doesn't exist
+            }
+        }
+
+        stage ('Build Docker Image') {
+            steps {
+                sh "docker build -t $NAME ."
+            }
+        }
+
+        stage ('Push to ECR') {
+            steps {
+                script {
+                    sh "docker tag $NAME ${URL_REGISTRY}/${ECR_REPO}:latest"
+                    sh "docker push ${URL_REGISTRY}/${ECR_REPO}:latest"
                 }
             }
-            stage ('Build Docker Image') {
-                steps {
-                    sh "docker build -t $NAME ."
-                }
-
-            } 
         }
     }
+}
