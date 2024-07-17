@@ -1,6 +1,6 @@
 pipeline {
-    tool {'nodejs'}
-    
+    tool { nodejs 'nodejs' }
+    agent {any 'any'}
     stages {
 
         stage ('SCM') { 
