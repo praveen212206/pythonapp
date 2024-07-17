@@ -10,7 +10,7 @@ node {
 
     stage('Build image') {
         step {
-           sh  "docker build -t(imageName) ."     
+           sh  "docker build -t test ."     
         }
         
     }
