@@ -21,7 +21,7 @@
                     script {
                     withCredentials([usernamePassword(credentialsId: 'ECR-DEMO-CREDS', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                         // Login to ECR
-                        sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username sudharsan devops --password-stdin ${URL_REGISTRY}"
+                        sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username CICD-ECR-ALL --password-stdin ${URL_REGISTRY}"
                     }
                 }
              }
