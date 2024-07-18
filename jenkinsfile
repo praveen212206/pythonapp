@@ -1,5 +1,6 @@
 pipeline {
     agent any
+    
     environment {
         AWS_DEFAULT_REGION = 'ap-southeast-1'
         ECR_REPO = 'pythonapplication'
@@ -7,6 +8,7 @@ pipeline {
         URL_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
         NAME = "testpython"
     }
+    
     stages {
         stage ('SCM') {
             steps {
@@ -28,6 +30,7 @@ pipeline {
                 }
             }
         }
+        
         stage ('Build Docker Image') {
             steps {
                 sh "docker build -t $NAME ."
@@ -42,6 +45,27 @@ pipeline {
                     sh "docker push ${URL_REGISTRY}/${ECR_REPO}:latest"
                 }
             }
+        }
+        
+        stage ('Deploy Container') {
+            steps {
+                script {
+                    // Deploy Docker container from ECR
+                    sh "docker pull ${URL_REGISTRY}/${ECR_REPO}:latest"
+                    sh "docker run -d --name ${NAME} -p 8080:8080 ${URL_REGISTRY}/${ECR_REPO}:latest"
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+            // Add any further actions on success
+        }
+        failure {
+            echo 'Pipeline failed!'
+            // Add any further actions on failure
         }
     }
 }
