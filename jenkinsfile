@@ -1,51 +1,61 @@
 pipeline {
     agent any
-
     environment {
         AWS_DEFAULT_REGION = 'ap-southeast-1'
         ECR_REPO = 'pythonapplication'
         AWS_ACCOUNT_ID = '891377182218'
         URL_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
-        NAME = "testpython"
+        NAME = 'testpython'
     }
-
     stages {
-        stage ('SCM') {
+        stage('SCM') {
             steps {
                 checkout scm
             }
         }
 
-        stage ('Docker Login') {
+        stage('Docker Login') {
             steps {
                 script {
-                    // Retrieve ECR login password using AWS CLI
-                    def ecrLoginCmd = "aws ecr get-login-password --region ${AWS_DEFAULT_REGION}"
-                    def ecrPassword = sh(script: ecrLoginCmd, returnStdout: true).trim()
+                    withCredentials([[
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: 'ECR_CREDS',
+                        accessKeyVariable: '',
+                        secretKeyVariable: '',
+                        region: AWS_DEFAULT_REGION
+                    ]]) {
+                        def ecrLoginCmd = "aws ecr get-login-password --region ${AWS_DEFAULT_REGION}"
+                        def ecrPassword = sh(script: ecrLoginCmd, returnStdout: true).trim()
 
-                    // Docker login to ECR
-                    sh "docker login --username AWS --password-stdin ${ecrPassword} ${URL_REGISTRY}"
+                        // Docker login to ECR
+                        def dockerLoginCmd = "docker login --username AWS --password-stdin ${URL_REGISTRY}"
+                        sh "echo ${ecrPassword} | ${dockerLoginCmd}"
+                    }
                 }
             }
         }
 
-        stage ('Removing Existing Container and Images') {
+        stage('Removing Existing Container and Images') {
             steps {
-                sh "docker rmi $NAME || true"  // Use || true to ignore errors if image doesn't exist
+                script {
+                    sh "docker rmi ${NAME} || true"  // Use || true to ignore errors if image doesn't exist
+                }
             }
         }
 
-        stage ('Build Docker Image') {
+        stage('Build Docker Image') {
             steps {
-                sh "docker build -t $NAME ."
+                script {
+                    sh "docker build -t ${NAME} ."
+                }
             }
         }
 
-        stage ('Push to ECR') {
+        stage('Push to ECR') {
             steps {
                 script {
                     // Tag and push Docker image to ECR
-                    sh "docker tag $NAME ${URL_REGISTRY}/${ECR_REPO}:latest"
+                    sh "docker tag ${NAME} ${URL_REGISTRY}/${ECR_REPO}:latest"
                     sh "docker push ${URL_REGISTRY}/${ECR_REPO}:latest"
                 }
             }
