@@ -28,13 +28,6 @@ pipeline {
                 }
             }
         }
-
-        stage ('Removing Existing Container and Images') {
-            steps {
-                sh "docker rmi $NAME  true"  // Use  true to ignore errors if image doesn't exist
-            }
-        }
-
         stage ('Build Docker Image') {
             steps {
                 sh "docker build -t $NAME ."
