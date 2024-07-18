@@ -22,7 +22,7 @@ pipeline {
                         def ecrPassword = sh(script: ecrLoginCmd, returnStdout: true).trim()
 
                         // Docker login to ECR
-                        def dockerLoginCmd = "docker login --username AWS --password ${ecrPassword} ${URL_REGISTRY}"
+                        def dockerLoginCmd = "docker login --username AWS --password-stdin ${ecrPassword} ${URL_REGISTRY}"
                         sh dockerLoginCmd
                     }
                 }
