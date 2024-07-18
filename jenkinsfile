@@ -5,7 +5,7 @@ pipeline {
         ECR_REPO = 'pythonapplicationdocker'
         AWS_ACCOUNT_ID = '891377182218'
         URL_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
-        NAME = "891377182218.dkr.ecr.ap-southeast-1.amazonaws.com/pythonapplication"
+        NAME = "testpython"
     }
     stages {
         stage ('SCM') {
