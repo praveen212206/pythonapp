@@ -52,7 +52,7 @@ pipeline {
                 script {
                     // Deploy Docker container from ECR
                     sh "docker pull ${URL_REGISTRY}/${ECR_REPO}:latest"
-                    sh "docker run -d --name ${NAME} -p 8080:8080 ${URL_REGISTRY}/${ECR_REPO}:latest"
+                    sh "docker run -d --name ${NAME} -p 3333:3333 ${URL_REGISTRY}/${ECR_REPO}:latest"
                 }
             }
         }
