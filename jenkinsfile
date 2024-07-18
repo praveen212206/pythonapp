@@ -1,5 +1,6 @@
 pipeline {
     agent any
+
     environment {
         AWS_DEFAULT_REGION = 'ap-southeast-1'
         ECR_REPO = 'pythonapplication'
@@ -7,6 +8,7 @@ pipeline {
         URL_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
         NAME = "testpython"
     }
+
     stages {
         stage ('SCM') {
             steps {
@@ -17,14 +19,12 @@ pipeline {
         stage ('Docker Login') {
             steps {
                 script {
-                    withCredentials([aws(credentialsId: 'ECR_CREDS', region: AWS_DEFAULT_REGION)]) {
-                        def ecrLoginCmd = "aws ecr get-login-password --region ${AWS_DEFAULT_REGION}"
-                        def ecrPassword = sh(script: ecrLoginCmd, returnStdout: true).trim()
+                    // Retrieve ECR login password using AWS CLI
+                    def ecrLoginCmd = "aws ecr get-login-password --region ${AWS_DEFAULT_REGION}"
+                    def ecrPassword = sh(script: ecrLoginCmd, returnStdout: true).trim()
 
-                        // Docker login to ECR
-                        def dockerLoginCmd = "docker login --username AWS --password-stdin ${ecrPassword} ${URL_REGISTRY}"
-                        sh dockerLoginCmd
-                    }
+                    // Docker login to ECR
+                    sh "docker login --username AWS --password-stdin ${ecrPassword} ${URL_REGISTRY}"
                 }
             }
         }
