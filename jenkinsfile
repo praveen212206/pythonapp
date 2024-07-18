@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        AWS_DEFAULT_REGION = 'ap-southeast-2'
+        AWS_DEFAULT_REGION = 'ap-southeast-1'
         ECR_REPO = 'pythonapplication'
         AWS_ACCOUNT_ID = '891377182218'
         URL_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
