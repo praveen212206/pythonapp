@@ -1,26 +1,52 @@
-node {
-    def application = "pythonapp"
-    def dockerhubaccountid = "praveen2106"
-    stage('Clone repository') {
-        checkout scm
+pipeline {
+    agent any
+    environment {
+        APPLICATION = "pythonapp"
+        DOCKERHUB_ACCOUNT_ID = "praveen2106"
+        IMAGE_NAME = "${DOCKERHUB_ACCOUNT_ID}/${APPLICATION}"
+        BUILD_TAG = "${BUILD_NUMBER}"
     }
-
-    stage('Build image') {
-        app = docker.build("${dockerhubaccountid}/${application}:${BUILD_NUMBER}")
+    stages {
+        stage('Clone Repository') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Build Image') {
+            steps {
+                script {
+                    app = docker.build("${IMAGE_NAME}:${BUILD_TAG}")
+                }
+            }
+        }
+        stage('Push Image') {
+            steps {
+                withDockerRegistry([ credentialsId: 'dockerHub', url: '' ]) {
+                    script {
+                        app.push("${BUILD_TAG}")
+                        app.push('latest')
+                    }
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                script {
+                    sh "docker run -itd -p 3333:3333 ${IMAGE_NAME}:${BUILD_TAG}"
+                }
+            }
+        }
+        stage('Remove Old Images') {
+            steps {
+                script {
+                    sh "docker rmi ${IMAGE_NAME}:latest -f"
+                }
+            }
+        }
     }
-
-    stage('Push image') {
-        withDockerRegistry([ credentialsId: "dockerHub", url: "" ]) {
-        app.push()
-        app.push("latest")
+    post {
+        always {
+            cleanWs()
+        }
     }
-    }
-
-    stage('Deploy') {
-        sh ("docker run -d -p 3333:3333 ${dockerhubaccountid}/${application}:${BUILD_NUMBER}")
-    }
-
-    stage('Remove old images') {
-        // remove old docker images
-        sh("docker rmi ${dockerhubaccountid}/${application}:latest -f")
-   }
+}
