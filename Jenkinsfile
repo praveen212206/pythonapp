@@ -32,7 +32,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    sh "docker run -d -p 3333:3333 ${IMAGE_NAME}:${BUILD_TAG}"
+                    sh "docker run -itd -p 3333:3333 ${IMAGE_NAME}:${BUILD_TAG}"
                 }
             }
         }
