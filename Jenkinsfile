@@ -15,7 +15,7 @@ pipeline {
         stage('Build Image') {
             steps {
                 script {
-                    app = docker.build("${IMAGE_NAME}:${BUILD_TAG}")
+                    def app = docker.build("${IMAGE_NAME}:${BUILD_TAG}")
                 }
             }
         }
@@ -23,8 +23,8 @@ pipeline {
             steps {
                 withDockerRegistry([ credentialsId: 'dockerHub', url: '' ]) {
                     script {
-                        app.push("${BUILD_TAG}")
-                        app.push('latest')
+                        docker.image("${IMAGE_NAME}:${BUILD_TAG}").push("${BUILD_TAG}")
+                        docker.image("${IMAGE_NAME}:${BUILD_TAG}").push('latest')
                     }
                 }
             }
@@ -32,7 +32,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    sh "docker run -itd -p 3333:3333 ${IMAGE_NAME}:${BUILD_TAG}"
+                    sh "docker run -d -p 3333:3333 ${IMAGE_NAME}:${BUILD_TAG}"
                 }
             }
         }
