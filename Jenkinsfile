@@ -13,11 +13,4 @@ pipeline {
             }
         }
     }
-    stage('Build Image') {
-            steps {
-                script {
-                    app = docker.build("${IMAGE_NAME}:${BUILD_TAG}")
-                }
-            }
-        }
 }
