@@ -1,16 +1,26 @@
-pipeline {
-    agent any
-    environment {
-        APPLICATION = "pythonapp"
-        DOCKERHUB_ACCOUNT_ID = "praveen2106"
-        IMAGE_NAME = "${DOCKERHUB_ACCOUNT_ID}/${APPLICATION}"
-        BUILD_TAG = "${BUILD_NUMBER}"
+node {
+    def application = "pythonapp"
+    def dockerhubaccountid = "praveen2106"
+    stage('Clone repository') {
+        checkout scm
     }
-    stages {
-        stage('Clone Repository') {
-            steps {
-                checkout scm
-            }
-        }
+
+    stage('Build image') {
+        app = docker.build("${dockerhubaccountid}/${application}:${BUILD_NUMBER}")
     }
-}
+
+    stage('Push image') {
+        withDockerRegistry([ credentialsId: "dockerHub", url: "" ]) {
+        app.push()
+        app.push("latest")
+    }
+    }
+
+    stage('Deploy') {
+        sh ("docker run -d -p 3333:3333 ${dockerhubaccountid}/${application}:${BUILD_NUMBER}")
+    }
+
+    stage('Remove old images') {
+        // remove old docker images
+        sh("docker rmi ${dockerhubaccountid}/${application}:latest -f")
+   }
