@@ -19,34 +19,4 @@ pipeline {
                 }
             }
         }
-        stage('Push Image') {
-            steps {
-                withDockerRegistry([ credentialsId: 'dockerHub', url: '' ]) {
-                    script {
-                        docker.image("${IMAGE_NAME}:${BUILD_TAG}").push("${BUILD_TAG}")
-                        docker.image("${IMAGE_NAME}:${BUILD_TAG}").push('latest')
-                    }
-                }
-            }
-        }
-        stage('Deploy') {
-            steps {
-                script {
-                    sh "docker run -d -p 3333:3333 ${IMAGE_NAME}:${BUILD_TAG}"
-                }
-            }
-        }
-        stage('Remove Old Images') {
-            steps {
-                script {
-                    sh "docker rmi ${IMAGE_NAME}:latest -f"
-                }
-            }
-        }
-    }
-    post {
-        always {
-            cleanWs()
-        }
-    }
 }
