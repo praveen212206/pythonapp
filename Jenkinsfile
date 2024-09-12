@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        APPLICATION = "pythonapp"
+        NAME = "pythonapp"
         DOCKERHUB_ACCOUNT_ID = "praveen2106"
         IMAGE_NAME = "${DOCKERHUB_ACCOUNT_ID}/${APPLICATION}"
         BUILD_TAG = "${BUILD_NUMBER}"
@@ -12,5 +12,10 @@ pipeline {
                 checkout scm
             }
         }
+    }
+    stage ('Build Docker Image') {
+            steps {
+                sh "docker build -t $NAME ."
+            }
     }
 }
