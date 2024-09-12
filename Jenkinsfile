@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        NAME = "pythonapp"
+        APPLICATION = "pythonapp"
         DOCKERHUB_ACCOUNT_ID = "praveen2106"
         IMAGE_NAME = "${DOCKERHUB_ACCOUNT_ID}/${APPLICATION}"
         BUILD_TAG = "${BUILD_NUMBER}"
@@ -13,9 +13,11 @@ pipeline {
             }
         }
     }
-    stage ('Build Docker Image') {
+    stage('Build Image') {
             steps {
-                sh "docker build -t $NAME ."
+                script {
+                    app = docker.build("${IMAGE_NAME}:${BUILD_TAG}")
+                }
             }
-    }
+        }
 }
